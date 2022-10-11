@@ -1163,9 +1163,9 @@ void AliAnalysisTaskHFSimpleVertices::UserCreateOutputObjects()
   fOutput->Add(fHistITSmapSelTracks);
 
   // vertex histos
-  fHistPrimVertX = new TH1F("hPrimVertX", " Primary Vertex ; x (cm)", 400, -0.5, 0.5);
-  fHistPrimVertY = new TH1F("hPrimVertY", " Primary Vertex ; y (cm)", 400, -0.5, 0.5);
-  fHistPrimVertZ = new TH1F("hPrimVertZ", " Primary Vertex ; z (cm)", 400, -20.0, 20.0);
+  fHistPrimVertX = new TH1F("hPrimVertX", " Primary Vertex ; x (cm)", 400, -0.4, 0.4);
+  fHistPrimVertY = new TH1F("hPrimVertY", " Primary Vertex ; y (cm)", 400, -0.2, 0.6);
+  fHistPrimVertZ = new TH1F("hPrimVertZ", " Primary Vertex ; z (cm)", 200, -40.0, 40.0);
   fHistPrimVertContr = new TH1F("fHistPrimVertContr", " Primary Vertex ; N contributors", 20001, -0.5, 20000.5);
   fHist2ProngVertX = new TH1F("h2ProngVertX", " Secondary Vertex ; x (cm)", 1000, -2., 2.);
   fHist2ProngVertY = new TH1F("h2ProngVertY", " Secondary Vertex ; y (cm)", 1000, -2., 2.);
