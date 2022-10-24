@@ -2514,6 +2514,9 @@ AliESDVertex* AliAnalysisTaskHFSimpleVertices::ReconstructSecondaryVertex(TObjAr
     Double_t vertCov[6];
     Double_t vertChi2 = -999.;
     if (trkArray->GetEntriesFast() == 2) {
+      AliESDtrack* track0 = (AliESDtrack*)trkArray->At(0);
+      AliESDtrack* track1 = (AliESDtrack*)trkArray->At(1);
+      printf("2-prong tracks: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", track0->GetID(), track1->GetID(), track0->Pt(), track1->Pt(), track0->Eta(), track1->Eta(), track0->Phi(), track1->Phi());
       nVert = fO2Vertexer2Prong.process(*o2Track[0], *o2Track[1]);
       if (nVert) {
         fO2Vertexer2Prong.propagateTracksToVertex();
