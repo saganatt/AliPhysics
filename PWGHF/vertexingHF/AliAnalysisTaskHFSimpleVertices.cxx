@@ -1835,9 +1835,13 @@ void AliAnalysisTaskHFSimpleVertices::UserExec(Option_t*)
   TObjArray* threeTrackArray = new TObjArray(3);
   Double_t mom0[3], mom1[3], mom2[3];
   Int_t nv0 = esd->GetNumberOfV0s();
+
+  printf("Total tracks: %d\n", totTracks);
+
   for (Int_t iPosTrack_0 = 0; iPosTrack_0 < totTracks; iPosTrack_0++) {
     AliESDtrack* track_p0 = esd->GetTrack(iPosTrack_0);
     track_p0->GetPxPyPz(mom0);
+    printf("Positive track for 2-prong: %d pt: %.3f eta: %.3f phi: %.3f\n", track_p0->GetID(), track_p0->Pt(), track_p0->Eta(), track_p0->Phi());
     if (status[iPosTrack_0] == 0)
       continue;
     track_p0->PropagateToDCA(primVtxTrk, bzkG, 100., d0track, covd0track);
@@ -1935,6 +1939,7 @@ void AliAnalysisTaskHFSimpleVertices::UserExec(Option_t*)
     }
     if (track_p0->Charge() < 0)
       continue;
+    printf("Positive checked track for 2-prong: %d pt: %.3f eta: %.3f phi: %.3f\n", track_p0->GetID(), track_p0->Pt(), track_p0->Eta(), track_p0->Phi());
     for (Int_t iNegTrack_0 = 0; iNegTrack_0 < totTracks; iNegTrack_0++) {
       AliESDtrack* track_n0 = esd->GetTrack(iNegTrack_0);
       track_n0->GetPxPyPz(mom1);
@@ -2516,7 +2521,7 @@ AliESDVertex* AliAnalysisTaskHFSimpleVertices::ReconstructSecondaryVertex(TObjAr
     if (trkArray->GetEntriesFast() == 2) {
       AliESDtrack* track0 = (AliESDtrack*)trkArray->At(0);
       AliESDtrack* track1 = (AliESDtrack*)trkArray->At(1);
-      printf("2-prong tracks: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", track0->GetID(), track1->GetID(), track0->Pt(), track1->Pt(), track0->Eta(), track1->Eta(), track0->Phi(), track1->Phi());
+      //printf("2-prong tracks: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", track0->GetID(), track1->GetID(), track0->Pt(), track1->Pt(), track0->Eta(), track1->Eta(), track0->Phi(), track1->Phi());
       nVert = fO2Vertexer2Prong.process(*o2Track[0], *o2Track[1]);
       if (nVert) {
         fO2Vertexer2Prong.propagateTracksToVertex();
