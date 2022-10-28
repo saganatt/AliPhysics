@@ -136,6 +136,16 @@ class AliAnalysisTaskHFSimpleVertices : public AliAnalysisTaskSE
   TH1F* fHistITSmapAllTracks;         //!<!  histo with its map all tracks
   TH1F* fHistITSmapSelTracks;         //!<!  histo withits map selected tracks
 
+  TH1F* fHistPtTracks2ProngAll;
+  TH1F* fHistPtTracks2ProngPos;
+  TH1F* fHistPtTracks2ProngNeg;
+  TH1F* fHistEtaTracks2ProngAll;
+  TH1F* fHistEtaTracks2ProngPos;
+  TH1F* fHistEtaTracks2ProngNeg;
+  TH1F* fHistImpParTracks2ProngAll;
+  TH1F* fHistImpParTracks2ProngPos;
+  TH1F* fHistImpParTracks2ProngNeg;
+
   TH1F* fHistPrimVertX;    //!<!  histo of prim vertex x
   TH1F* fHistPrimVertY;    //!<!  histo of prim vertex y
   TH1F* fHistPrimVertZ;    //!<!  histo of prim vertex z

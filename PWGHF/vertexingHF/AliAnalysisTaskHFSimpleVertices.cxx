@@ -74,6 +74,15 @@ AliAnalysisTaskHFSimpleVertices::AliAnalysisTaskHFSimpleVertices() :
   fHistImpParSelTracksbachelor{nullptr},
   fHistITSmapAllTracks{nullptr},
   fHistITSmapSelTracks{nullptr},
+  fHistPtTracks2ProngAll{nullptr},
+  fHistPtTracks2ProngPos{nullptr},
+  fHistPtTracks2ProngNeg{nullptr},
+  fHistEtaTracks2ProngAll{nullptr},
+  fHistEtaTracks2ProngPos{nullptr},
+  fHistEtaTracks2ProngNeg{nullptr},
+  fHistImpParTracks2ProngAll{nullptr},
+  fHistImpParTracks2ProngPos{nullptr},
+  fHistImpParTracks2ProngNeg{nullptr},
   fHistPrimVertX{nullptr},
   fHistPrimVertY{nullptr},
   fHistPrimVertZ{nullptr},
@@ -329,6 +338,15 @@ AliAnalysisTaskHFSimpleVertices::~AliAnalysisTaskHFSimpleVertices()
     delete fHistImpParSelTracksbachelor;
     delete fHistITSmapAllTracks;
     delete fHistITSmapSelTracks;
+    delete fHistPtTracks2ProngAll;
+    delete fHistPtTracks2ProngPos;
+    delete fHistPtTracks2ProngNeg;
+    delete fHistEtaTracks2ProngAll;
+    delete fHistEtaTracks2ProngPos;
+    delete fHistEtaTracks2ProngNeg;
+    delete fHistImpParTracks2ProngAll;
+    delete fHistImpParTracks2ProngPos;
+    delete fHistImpParTracks2ProngNeg;
     delete fHistPrimVertX;
     delete fHistPrimVertY;
     delete fHistPrimVertZ;
@@ -1145,6 +1163,25 @@ void AliAnalysisTaskHFSimpleVertices::UserCreateOutputObjects()
   fHistImpParSelTracksbachelor = new TH1F("hImpParSelTracksbachelor", " Selected tracks ; d_{0}^{xy} (cm)", nBinsDCA, lowlimDCA, higlimDCA);
   fHistITSmapAllTracks = new TH1F("hITSmapAllTracks", " All tracks ; ITS cluster map", 64, -0.5, 63.5);
   fHistITSmapSelTracks = new TH1F("hITSmapSelTracks", " Selected tracks ; ITS cluster map", 64, -0.5, 63.5);
+
+  fHistPtTracks2ProngAll = new TH1F("hPtTracks2ProngAll", " All tracks ; p_{T} (GeV/c)", 360, 0., 36.);
+  fHistPtTracks2ProngPos = new TH1F("hPtTracks2ProngPos", " Positive tracks ; p_{T} (GeV/c)", 360, 0., 36.);
+  fHistPtTracks2ProngNeg = new TH1F("hPtTracks2ProngNeg", " Negative tracks ; p_{T} (GeV/c)", 360, 0., 36.);
+  nBinsETA = 100;
+  lowlimETA = -1.;
+  higlimETA = 1.;
+  if (eta2maxcut < 10) {
+    nBinsETA = static_cast<int>(1.2 * eta2maxcut * 100);
+    lowlimETA = 1.2 * eta2mincut;
+    higlimETA = 1.2 * eta2maxcut;
+  }
+  fHistEtaTracks2ProngAll = new TH1F("hEtaTracks2ProngAll", " All tracks ; #eta", nBinsETA, lowlimETA, higlimETA);
+  fHistEtaTracks2ProngPos = new TH1F("hEtaTracks2ProngPos", " Positive tracks ; #eta", nBinsETA, lowlimETA, higlimETA);
+  fHistEtaTracks2ProngNeg = new TH1F("hEtaTracks2ProngNeg", " Negative tracks ; #eta", nBinsETA, lowlimETA, higlimETA);
+  fHistImpParTracks2ProngAll = new TH1F("hImpParTracks2ProngAll", " All tracks ; d_{0}^{xy} (cm)", nBinsDCA, lowlimDCA, higlimDCA);
+  fHistImpParTracks2ProngPos = new TH1F("hImpParTracks2ProngPos", " Positive tracks ; d_{0}^{xy} (cm)", nBinsDCA, lowlimDCA, higlimDCA);
+  fHistImpParTracks2ProngNeg = new TH1F("hImpParTracks2ProngNeg", " Negative tracks ; d_{0}^{xy} (cm)", nBinsDCA, lowlimDCA, higlimDCA);
+
   fOutput->Add(fHistPtAllTracks);
   fOutput->Add(fHistPtSelTracks);
   fOutput->Add(fHistTglAllTracks);
@@ -1162,6 +1199,16 @@ void AliAnalysisTaskHFSimpleVertices::UserCreateOutputObjects()
   fOutput->Add(fHistImpParSelTracksbachelor);
   fOutput->Add(fHistITSmapAllTracks);
   fOutput->Add(fHistITSmapSelTracks);
+  
+  fOutput->Add(fHistPtTracks2ProngAll);
+  fOutput->Add(fHistPtTracks2ProngPos);
+  fOutput->Add(fHistPtTracks2ProngNeg);
+  fOutput->Add(fHistEtaTracks2ProngAll);
+  fOutput->Add(fHistEtaTracks2ProngPos);
+  fOutput->Add(fHistEtaTracks2ProngNeg);
+  fOutput->Add(fHistImpParTracks2ProngAll);
+  fOutput->Add(fHistImpParTracks2ProngPos);
+  fOutput->Add(fHistImpParTracks2ProngNeg);
 
   // vertex histos
   fHistPrimVertX = new TH1F("hPrimVertX", " Primary Vertex ; x (cm)", 400, -0.4, 0.4);
@@ -1953,6 +2000,22 @@ void AliAnalysisTaskHFSimpleVertices::UserExec(Option_t*)
       twoTrackArray->AddAt(track_p0, 0);
       twoTrackArray->AddAt(track_n0, 1);
 
+      // histos for pos, neg, all
+      fHistPtTracks2ProngAll->Fill(track_p0->Pt());
+      fHistPtTracks2ProngPos->Fill(track_p0->Pt());
+      fHistPtTracks2ProngAll->Fill(track_n0->Pt());
+      fHistPtTracks2ProngNeg->Fill(track_n0->Pt());
+      fHistEtaTracks2ProngAll->Fill(track_p0->Eta());
+      fHistEtaTracks2ProngPos->Fill(track_p0->Eta());
+      fHistEtaTracks2ProngAll->Fill(track_n0->Eta());
+      fHistEtaTracks2ProngNeg->Fill(track_n0->Eta());
+      fHistImpParTracks2ProngAll->Fill(d0track[0]);
+      fHistImpParTracks2ProngPos->Fill(d0track[0]);
+      Double_t d0Negtrack[2], covd0Negtrack[3];
+      track_n0->PropagateToDCA(primVtxTrk, bzkG, 100., d0Negtrack, covd0Negtrack);
+      fHistImpParTracks2ProngAll->Fill(d0Negtrack[0]);
+      fHistImpParTracks2ProngNeg->Fill(d0Negtrack[0]);
+
       AliESDVertex* trkv = ReconstructSecondaryVertex(twoTrackArray, primVtxTrk);
       if (trkv == 0x0) {
         twoTrackArray->Clear();
@@ -1973,6 +2036,7 @@ void AliAnalysisTaskHFSimpleVertices::UserExec(Option_t*)
         the2Prong->SetOwnPrimaryVtx(vertexAODp);
 
         printf("Selected 2-prong tracks: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", track_p0->GetID(), track_n0->GetID(), track_p0->Pt(), track_n0->Pt(), track_p0->Eta(), track_n0->Eta(), track_p0->Phi(), track_n0->Phi());
+        printf("Selected secondary vertex: %.3f %.3f %.3f\n", trkv->GetX(), trkv->GetY(), trkv->GetZ());
 
         // Separate case for jpsi for now
         Int_t jpsiSel = 3;
@@ -2009,6 +2073,8 @@ void AliAnalysisTaskHFSimpleVertices::UserExec(Option_t*)
           fHistCovMatSecVXZ2Prong->Fill(covMatrixSV[3]);
           fHistCovMatPrimVZZ2Prong->Fill(covMatrixPV[5]);
           fHistCovMatSecVZZ2Prong->Fill(covMatrixSV[5]);
+        } else {
+          printf("NOT selected with D0 Jpsi 2-prong tracks: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", track_p0->GetID(), track_n0->GetID(), track_p0->Pt(), track_n0->Pt(), track_p0->Eta(), track_n0->Eta(), track_p0->Phi(), track_n0->Phi());
         }
 
         Double_t ptD = the2Prong->Pt();
