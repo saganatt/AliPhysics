@@ -2023,6 +2023,7 @@ void AliAnalysisTaskHFSimpleVertices::UserExec(Option_t*)
 
       AliESDVertex* trkv = ReconstructSecondaryVertex(twoTrackArray, primVtxTrk);
       if (trkv == 0x0) {
+        printf("trkv 0x0 for 2-prong tracks: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f) DCA: (%.3f, %.3f)\n", track_p0->GetID(), track_n0->GetID(), track_p0->Pt(), track_n0->Pt(), track_p0->Eta(), track_n0->Eta(), track_p0->Phi(), track_n0->Phi(), dcas[iPosTrack_0], dcas[iNegTrack_0]);
         twoTrackArray->Clear();
         continue;
       }
@@ -2599,9 +2600,9 @@ AliESDVertex* AliAnalysisTaskHFSimpleVertices::ReconstructSecondaryVertex(TObjAr
     if (trkArray->GetEntriesFast() == 2) {
       AliESDtrack* track0 = (AliESDtrack*)trkArray->At(0);
       AliESDtrack* track1 = (AliESDtrack*)trkArray->At(1);
-      //printf("2-prong tracks: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", track0->GetID(), track1->GetID(), track0->Pt(), track1->Pt(), track0->Eta(), track1->Eta(), track0->Phi(), track1->Phi());
       nVert = fO2Vertexer2Prong.process(*o2Track[0], *o2Track[1]);
       if (nVert) {
+        printf("O2 vertexer processed pair: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", track0->GetID(), track1->GetID(), track0->Pt(), track1->Pt(), track0->Eta(), track1->Eta(), track0->Phi(), track1->Phi());
         fO2Vertexer2Prong.propagateTracksToVertex();
         auto vertPos = fO2Vertexer2Prong.getPCACandidate();
         auto vertCMat = fO2Vertexer2Prong.calcPCACovMatrix().Array();
@@ -2610,6 +2611,8 @@ AliESDVertex* AliAnalysisTaskHFSimpleVertices::ReconstructSecondaryVertex(TObjAr
         for (Int_t ic = 0; ic < 6; ic++)
           vertCov[ic] = vertCMat[ic];
         vertChi2 = fO2Vertexer2Prong.getChi2AtPCACandidate();
+      } else {
+        printf("No nVert from O2 vertexer: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", track0->GetID(), track1->GetID(), track0->Pt(), track1->Pt(), track0->Eta(), track1->Eta(), track0->Phi(), track1->Phi());
       }
     } else if (trkArray->GetEntriesFast() == 3) {
       nVert = fO2Vertexer3Prong.process(*o2Track[0], *o2Track[1], *o2Track[2]);
@@ -2650,8 +2653,17 @@ AliESDVertex* AliAnalysisTaskHFSimpleVertices::ReconstructSecondaryVertex(TObjAr
     vertCov[5] = dMesonVert.GetCovariance(2, 2);
     trkv = new AliESDVertex(vertCoord, vertCov, vertChi2, trkArray->GetEntriesFast());
   }
-  if (!trkv)
+  AliESDtrack* track0 = (AliESDtrack*)trkArray->At(0);
+  AliESDtrack* track1 = (AliESDtrack*)trkArray->At(1);
+  if (!trkv) {
+    printf("O2 vertexer no trkv created: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", track0->GetID(), track1->GetID(), track0->Pt(), track1->Pt(), track0->Eta(), track1->Eta(), track0->Phi(), track1->Phi());
     return 0x0;
+  }
+  Double_t vertRadius2 = trkv->GetX() * trkv->GetX() + trkv->GetY() * trkv->GetY();
+  if (vertRadius2 > fMaxDecVertRadius2) {
+    printf("O2 vertexer vertRadius2 %.3f bigger than max %.3f: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", vertRadius2, fMaxDecVertRadius2, track0->GetID(), track1->GetID(), track0->Pt(), track1->Pt(), track0->Eta(), track1->Eta(), track0->Phi(), track1->Phi());
+    return 0x0;
+  }
   //  trkv->Print("all");
   //  printf("=============\n");
   return trkv;
