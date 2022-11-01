@@ -2007,6 +2007,20 @@ void AliAnalysisTaskHFSimpleVertices::UserExec(Option_t*)
       twoTrackArray->AddAt(track_p0, 0);
       twoTrackArray->AddAt(track_n0, 1);
 
+      // histos for pos, neg, all
+      fHistPtTracks2ProngAll->Fill(track_p0->Pt());
+      fHistPtTracks2ProngPos->Fill(track_p0->Pt());
+      fHistPtTracks2ProngAll->Fill(track_n0->Pt());
+      fHistPtTracks2ProngNeg->Fill(track_n0->Pt());
+      fHistEtaTracks2ProngAll->Fill(track_p0->Eta());
+      fHistEtaTracks2ProngPos->Fill(track_p0->Eta());
+      fHistEtaTracks2ProngAll->Fill(track_n0->Eta());
+      fHistEtaTracks2ProngNeg->Fill(track_n0->Eta());
+      fHistImpParTracks2ProngAll->Fill(dcas[iPosTrack_0]);
+      fHistImpParTracks2ProngPos->Fill(dcas[iPosTrack_0]);
+      fHistImpParTracks2ProngAll->Fill(dcas[iNegTrack_0]);
+      fHistImpParTracks2ProngNeg->Fill(dcas[iNegTrack_0]);
+
       AliESDVertex* trkv = ReconstructSecondaryVertex(twoTrackArray, primVtxTrk);
       if (trkv == 0x0) {
         twoTrackArray->Clear();
@@ -2022,20 +2036,6 @@ void AliAnalysisTaskHFSimpleVertices::UserExec(Option_t*)
       //printf("Secondary vertex: %.3f %.3f %.3f\n", trkv->GetX(), trkv->GetY(), trkv->GetZ());
 
       //if (SelectInvMassAndPt2prong(twoTrackArray, rd4massCalc2) > 0) {
-
-        // histos for pos, neg, all
-        fHistPtTracks2ProngAll->Fill(track_p0->Pt());
-        fHistPtTracks2ProngPos->Fill(track_p0->Pt());
-        fHistPtTracks2ProngAll->Fill(track_n0->Pt());
-        fHistPtTracks2ProngNeg->Fill(track_n0->Pt());
-        fHistEtaTracks2ProngAll->Fill(track_p0->Eta());
-        fHistEtaTracks2ProngPos->Fill(track_p0->Eta());
-        fHistEtaTracks2ProngAll->Fill(track_n0->Eta());
-        fHistEtaTracks2ProngNeg->Fill(track_n0->Eta());
-        fHistImpParTracks2ProngAll->Fill(dcas[iPosTrack_0]);
-        fHistImpParTracks2ProngPos->Fill(dcas[iPosTrack_0]);
-        fHistImpParTracks2ProngAll->Fill(dcas[iNegTrack_0]);
-        fHistImpParTracks2ProngNeg->Fill(dcas[iNegTrack_0]);
 
         AliAODVertex* vertexAOD = ConvertToAODVertex(trkv);
         AliAODRecoDecayHF2Prong* the2Prong = Make2Prong(twoTrackArray, vertexAOD, bzkG);
