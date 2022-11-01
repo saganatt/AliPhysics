@@ -2021,7 +2021,7 @@ void AliAnalysisTaskHFSimpleVertices::UserExec(Option_t*)
 
       //printf("Secondary vertex: %.3f %.3f %.3f\n", trkv->GetX(), trkv->GetY(), trkv->GetZ());
 
-      if (SelectInvMassAndPt2prong(twoTrackArray, rd4massCalc2) > 0) {
+      //if (SelectInvMassAndPt2prong(twoTrackArray, rd4massCalc2) > 0) {
 
         // histos for pos, neg, all
         fHistPtTracks2ProngAll->Fill(track_p0->Pt());
@@ -2186,7 +2186,7 @@ void AliAnalysisTaskHFSimpleVertices::UserExec(Option_t*)
         }
         delete the2Prong;
         delete vertexAOD;
-      }
+      //}
       delete trkv;
       if (fDo3Prong) {
         if ((status[iPosTrack_0] & 2) == 0)
