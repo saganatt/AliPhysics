@@ -1888,28 +1888,32 @@ void AliAnalysisTaskHFSimpleVertices::UserExec(Option_t*)
   fTotalTracks += totTracks;
   //printf("Total tracks: %d cumulated total: %d\n", totTracks, fTotalTracks);
 
+  for (Int_t iTrack = 0; iTrack < totTracks; iTrack++) {
+    AliESDtrack* track = esd->GetTrack(iTrack);
+    track->GetPxPyPz(mom0);
+    track->PropagateToDCA(primVtxTrk, bzkG, 100., d0track, covd0track);
+    dcas[iTrack] = d0track[0];
+    printf("Written DCA XY for track: %d, ID %d: %.3f (%.3f)\n", iTrack, track->GetID(), dcas[iTrack], d0track[0]);
+  }
+
   for (Int_t iPosTrack_0 = 0; iPosTrack_0 < totTracks; iPosTrack_0++) {
     AliESDtrack* track_p0 = esd->GetTrack(iPosTrack_0);
-    track_p0->GetPxPyPz(mom0);
-    track_p0->PropagateToDCA(primVtxTrk, bzkG, 100., d0track, covd0track);
-    dcas[iPosTrack_0] = d0track[0];
-    printf("Written DCA XY for track: %d, ID %d: %.3f (%.3f)\n", iPosTrack_0, track_p0->GetID(), dcas[iPosTrack_0], d0track[0]);
     if (status[iPosTrack_0] == 0)
       continue;
     fHistPtSelTracks->Fill(track_p0->Pt());
     fHistTglSelTracks->Fill(track_p0->GetTgl());
     if (status[iPosTrack_0] & 1) {
-      fHistImpParSelTracks2prong->Fill(d0track[0]);
+      fHistImpParSelTracks2prong->Fill(dcas[iPosTrack_0]);
       fHistEtaSelTracks2prong->Fill(track_p0->Eta());
       fHistPtSelTracks2prong->Fill(track_p0->Pt());
     }
     if (status[iPosTrack_0] & 2) {
-      fHistImpParSelTracks3prong->Fill(d0track[0]);
+      fHistImpParSelTracks3prong->Fill(dcas[iPosTrack_0]);
       fHistEtaSelTracks3prong->Fill(track_p0->Eta());
       fHistPtSelTracks3prong->Fill(track_p0->Pt());
     }
     if (status[iPosTrack_0] & 4) {
-      fHistImpParSelTracksbachelor->Fill(d0track[0]);
+      fHistImpParSelTracksbachelor->Fill(dcas[iPosTrack_0]);
       fHistEtaSelTracksbachelor->Fill(track_p0->Eta());
       fHistPtSelTracksbachelor->Fill(track_p0->Pt());
     }
@@ -2028,8 +2032,8 @@ void AliAnalysisTaskHFSimpleVertices::UserExec(Option_t*)
         fHistEtaTracks2ProngPos->Fill(track_p0->Eta());
         fHistEtaTracks2ProngAll->Fill(track_n0->Eta());
         fHistEtaTracks2ProngNeg->Fill(track_n0->Eta());
-        fHistImpParTracks2ProngAll->Fill(d0track[0]);
-        fHistImpParTracks2ProngPos->Fill(d0track[0]);
+        fHistImpParTracks2ProngAll->Fill(dcas[iPosTrack_0]);
+        fHistImpParTracks2ProngPos->Fill(dcas[iPosTrack_0]);
         fHistImpParTracks2ProngAll->Fill(dcas[iNegTrack_0]);
         fHistImpParTracks2ProngNeg->Fill(dcas[iNegTrack_0]);
 
@@ -2037,7 +2041,7 @@ void AliAnalysisTaskHFSimpleVertices::UserExec(Option_t*)
         AliAODRecoDecayHF2Prong* the2Prong = Make2Prong(twoTrackArray, vertexAOD, bzkG);
         the2Prong->SetOwnPrimaryVtx(vertexAODp);
 
-        printf("Selected 2-prong tracks: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f) DCA: (%.3f, %.3f)\n", track_p0->GetID(), track_n0->GetID(), track_p0->Pt(), track_n0->Pt(), track_p0->Eta(), track_n0->Eta(), track_p0->Phi(), track_n0->Phi(), d0track[0], dcas[iNegTrack_0]);
+        printf("Selected 2-prong tracks: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f) DCA: (%.3f, %.3f)\n", track_p0->GetID(), track_n0->GetID(), track_p0->Pt(), track_n0->Pt(), track_p0->Eta(), track_n0->Eta(), track_p0->Phi(), track_n0->Phi(), dcas[iPosTrack_0], dcas[iNegTrack_0]);
         printf("Selected secondary vertex: %.3f %.3f %.3f\n", trkv->GetX(), trkv->GetY(), trkv->GetZ());
 
         // Separate case for jpsi for now
