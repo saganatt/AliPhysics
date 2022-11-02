@@ -2661,7 +2661,7 @@ AliESDVertex* AliAnalysisTaskHFSimpleVertices::ReconstructSecondaryVertex(TObjAr
   }
   Double_t vertRadius2 = trkv->GetX() * trkv->GetX() + trkv->GetY() * trkv->GetY();
   if (vertRadius2 > fMaxDecVertRadius2) {
-    printf("O2 vertexer vertRadius2 %.3f bigger than max %.3f: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", vertRadius2, fMaxDecVertRadius2, track0->GetID(), track1->GetID(), track0->Pt(), track1->Pt(), track0->Eta(), track1->Eta(), track0->Phi(), track1->Phi());
+    printf("O2 vertexer vertRadius2 %.3f (%.3f, %.3f) bigger than max %.3f: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", vertRadius2, trkv->GetX(), trkv->GetY(), fMaxDecVertRadius2, track0->GetID(), track1->GetID(), track0->Pt(), track1->Pt(), track0->Eta(), track1->Eta(), track0->Phi(), track1->Phi());
     return 0x0;
   }
   //  trkv->Print("all");
