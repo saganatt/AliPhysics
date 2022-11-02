@@ -1893,7 +1893,6 @@ void AliAnalysisTaskHFSimpleVertices::UserExec(Option_t*)
     track->GetPxPyPz(mom0);
     track->PropagateToDCA(primVtxTrk, bzkG, 100., d0track, covd0track);
     dcas[iTrack] = d0track[0];
-    printf("Written DCA XY for track: %d, ID %d: %.3f (%.3f)\n", iTrack, track->GetID(), dcas[iTrack], d0track[0]);
   }
 
   for (Int_t iPosTrack_0 = 0; iPosTrack_0 < totTracks; iPosTrack_0++) {
@@ -2600,11 +2599,13 @@ AliESDVertex* AliAnalysisTaskHFSimpleVertices::ReconstructSecondaryVertex(TObjAr
     if (trkArray->GetEntriesFast() == 2) {
       AliESDtrack* track0 = (AliESDtrack*)trkArray->At(0);
       AliESDtrack* track1 = (AliESDtrack*)trkArray->At(1);
+      printf("O2 vertexer input trackparcov covariances: YY: (%.3f, %.3f), YZ: (%.3f, %.3f), ZZ: (%.3f, %.3f)\n", o2Track[0]->getSigmaY2(), o2Track[1]->getSigmaY2(), o2Track[0]->getSigmaZY(), o2Track[1]->getSigmaZY(), o2Track[0]->getSigmaZ2(), o2Track[1]->getSigmaZ2());
       nVert = fO2Vertexer2Prong.process(*o2Track[0], *o2Track[1]);
       if (nVert) {
         printf("O2 vertexer processed pair: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", track0->GetID(), track1->GetID(), track0->Pt(), track1->Pt(), track0->Eta(), track1->Eta(), track0->Phi(), track1->Phi());
-        fO2Vertexer2Prong.propagateTracksToVertex();
+        //fO2Vertexer2Prong.propagateTracksToVertex();
         auto vertPos = fO2Vertexer2Prong.getPCACandidate();
+        //printf("Result vertex covariances: XX: %.3f, XY: %.3f, YY: %.3f, XZ: %.3f, YZ: %.3f, ZZ: %.3f\n", vertPos.getSigmaX2(), vertPos.getSigmaXY(), vertPos.getSigmaY2(), vertPos.getSigmaXZ(), vertPos.getSigmaYZ(), vertPos.getSigmaZ2());
         auto vertCMat = fO2Vertexer2Prong.calcPCACovMatrix().Array();
         for (Int_t ic = 0; ic < 3; ic++)
           vertCoord[ic] = vertPos[ic];
@@ -2659,11 +2660,11 @@ AliESDVertex* AliAnalysisTaskHFSimpleVertices::ReconstructSecondaryVertex(TObjAr
     printf("O2 vertexer no trkv created: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", track0->GetID(), track1->GetID(), track0->Pt(), track1->Pt(), track0->Eta(), track1->Eta(), track0->Phi(), track1->Phi());
     return 0x0;
   }
-  Double_t vertRadius2 = trkv->GetX() * trkv->GetX() + trkv->GetY() * trkv->GetY();
-  if (vertRadius2 > fMaxDecVertRadius2) {
-    printf("O2 vertexer vertRadius2 %.3f (%.3f, %.3f) bigger than max %.3f: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", vertRadius2, trkv->GetX(), trkv->GetY(), fMaxDecVertRadius2, track0->GetID(), track1->GetID(), track0->Pt(), track1->Pt(), track0->Eta(), track1->Eta(), track0->Phi(), track1->Phi());
-    return 0x0;
-  }
+  //Double_t vertRadius2 = trkv->GetX() * trkv->GetX() + trkv->GetY() * trkv->GetY();
+  //if (vertRadius2 > fMaxDecVertRadius2) {
+  //  printf("O2 vertexer vertRadius2 %.3f (%.3f, %.3f) bigger than max %.3f: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", vertRadius2, trkv->GetX(), trkv->GetY(), fMaxDecVertRadius2, track0->GetID(), track1->GetID(), track0->Pt(), track1->Pt(), track0->Eta(), track1->Eta(), track0->Phi(), track1->Phi());
+  //  return 0x0;
+  //}
   //  trkv->Print("all");
   //  printf("=============\n");
   return trkv;
