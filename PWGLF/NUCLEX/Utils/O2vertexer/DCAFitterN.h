@@ -163,7 +163,7 @@ class DCAFitterN
   int getNIterations(int cand = 0) const { return mNIters[mOrder[cand]]; }
   void setPropagateToPCA(bool v = true) { mPropagateToPCA = v; }
   void setMaxIter(int n = 20) { mMaxIter = n > 2 ? n : 2; }
-  void setMaxR(float r = 200.) { mMaxR2 = r * r; }
+  void setMaxR(float r = 200.) { printf("Setting maxR in fitter: %.2f^2 = %.2f, N: %d\n", r, r*r, N); mMaxR2 = r * r; }
   void setMaxDZIni(float d = 4.) { mMaxDZIni = d; }
   void setMaxDXYIni(float d = 4.) { mMaxDXYIni = d > 0 ? d : 1e9; }
   void setMaxChi2(float chi2 = 999.) { mMaxChi2 = chi2; }
@@ -338,17 +338,23 @@ int DCAFitterN<N, Args...>::process(const Tr&... args)
   if (mCrossings.nDCA == MAXHYP) { // if there are 2 candidates and they are too close, chose their mean as a starting point
     auto dst2 = (mCrossings.xDCA[0] - mCrossings.xDCA[1]) * (mCrossings.xDCA[0] - mCrossings.xDCA[1]) +
                 (mCrossings.yDCA[0] - mCrossings.yDCA[1]) * (mCrossings.yDCA[0] - mCrossings.yDCA[1]);
+    printf("2 crossing candidates for tracks x: (%.3f, %.3f),  y: (%.3f, %.3f), dist2: %.3f\n", mCrossings.xDCA[0], mCrossings.xDCA[1], mCrossings.yDCA[0], mCrossings.yDCA[1], dst2);
     if (dst2 < mMaxDist2ToMergeSeeds) {
       mCrossings.nDCA = 1;
       mCrossings.xDCA[0] = 0.5 * (mCrossings.xDCA[0] + mCrossings.xDCA[1]);
       mCrossings.yDCA[0] = 0.5 * (mCrossings.yDCA[0] + mCrossings.yDCA[1]);
+      printf("2 candidates %.3f closer than %.3f for tracks, choosing mean for start: (%.3f, %.3f)\n", dst2, mMaxDist2ToMergeSeeds, mCrossings.xDCA[0], mCrossings.yDCA[1]);
     }
   }
   // check all crossings
   for (int ic = 0; ic < mCrossings.nDCA; ic++) {
     // check if radius is acceptable
-    if (mCrossings.xDCA[ic] * mCrossings.xDCA[ic] + mCrossings.yDCA[ic] * mCrossings.yDCA[ic] > mMaxR2) {
+    auto rad = mCrossings.xDCA[ic] * mCrossings.xDCA[ic] + mCrossings.yDCA[ic] * mCrossings.yDCA[ic];
+    if (rad > mMaxR2) {
+      printf("Crossing %d (%.3f, %.3f) radius %.3f bigger than max %.3f, rejecting the crossing, mCurHyp %d\n", ic, mCrossings.xDCA[ic], mCrossings.yDCA[ic], rad, mMaxR2, mCurHyp);
       continue;
+    } else {
+      printf("Crossing %d (%.3f, %.3f) radius %.3f OK, mCurHyp\n", ic, mCrossings.xDCA[ic], mCrossings.yDCA[ic], rad, mCurHyp);
     }
     mCrossIDCur = ic;
     mCrossIDAlt = (mCrossings.nDCA == 2 && mAllowAltPreference) ? 1 - ic : -1; // works for max 2 crossings
@@ -361,11 +367,15 @@ int DCAFitterN<N, Args...>::process(const Tr&... args)
     if (mUseAbsDCA ? minimizeChi2NoErr() : minimizeChi2()) {
       mOrder[mCurHyp] = mCurHyp;
       if (mPropagateToPCA && !propagateTracksToVertex(mCurHyp)) {
+        printf("Failed to propagate, crossing %d, mCurHyp %d\n", ic, mCurHyp);
         continue; // discard candidate if failed to propagate to it
       }
       mCurHyp++;
+      printf("Propagated crossing %d, increased mCurHyp: %d\n", ic, mCurHyp); 
     }
   }
+
+  printf("mCurHyp after the loop %d\n", mCurHyp);
 
   for (int i = mCurHyp; i--;) { // order in quality
     for (int j = i; j--;) {
@@ -380,6 +390,7 @@ int DCAFitterN<N, Args...>::process(const Tr&... args)
     }
   }
 
+  printf("Final mCurHyp %d\n", mCurHyp);
   return mCurHyp;
 }
 
