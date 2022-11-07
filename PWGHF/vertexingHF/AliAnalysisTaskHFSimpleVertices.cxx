@@ -2065,6 +2065,7 @@ void AliAnalysisTaskHFSimpleVertices::UserExec(Option_t*)
 
         if (DzeroSkimCuts(the2Prong) || JpsiSkimCuts(the2Prong)) {
           //printf("Selected with D0 Jpsi 2-prong tracks: (%d, %d) pt: (%.3f, %.3f) eta: (%.3f, %.3f) phi: (%.3f, %.3f)\n", track_p0->GetID(), track_n0->GetID(), track_p0->Pt(), track_n0->Pt(), track_p0->Eta(), track_n0->Eta(), track_p0->Phi(), track_n0->Phi());
+          printf("Selected with D0 Jpsi secondary vertex: %.3f %.3f %.3f\n", trkv->GetX(), trkv->GetY(), trkv->GetZ());
           Double_t covMatrixPV[6], covMatrixSV[6];
           the2Prong->GetPrimaryVtx()->GetCovMatrix(covMatrixPV);
           the2Prong->GetSecondaryVtx()->GetCovMatrix(covMatrixSV);
