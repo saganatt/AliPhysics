@@ -9,6 +9,7 @@
 #include <TCanvas.h>
 #include <TLegend.h>
 #include <TLatex.h>
+#include <TROOT.h>
 #include "AliCFContainer.h"
 #include "AliPID.h"
 #endif
@@ -25,7 +26,7 @@ Int_t nToSave=0;
 
 
 void ProcessTrackingEffPID(TString filname="AnalysisResults.root",TString suffix=""){
-
+  gROOT->SetBatch(kTRUE);
 
   // Graphical setting for particle species
   TString partname[AliPID::kSPECIESC]={"e","#mu","#pi","K","p","d","t","3He","#alpha"};
