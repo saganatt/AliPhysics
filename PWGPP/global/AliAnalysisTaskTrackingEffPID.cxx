@@ -469,27 +469,30 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
       if(fKeepOnlyUE && isInjected) continue;
     }
     fHistNParticles->Fill(4);
+
+    int iSpecies = -1;
+    for (int iS = 0; iS < AliPID::kSPECIESC; ++iS) {
+      if (std::abs(part->PdgCode()) == AliPID::ParticleCode(iS)) {
+        iSpecies = iS;
+        break;
+      }
+    }
+    if (iSpecies < 0) continue;
+    // Somehow for electrons the charge is positive for PDG -11, negative for PDG 11
+    const int iCharge = iSpecies == 0 ? (part->Charge() > 0 ? 1 : 0) : (part->Charge() > 0 ? 0 : 1);
     
     double distx = part->Xv() - xMCVertex;
     double disty = part->Yv() - yMCVertex;
     double distXY = TMath::Sqrt(distx*distx+disty*disty);
     double arrayForSparse[6]={part->Eta(),part->Phi(),part->Pt(),multEstim,zMCVertex,distXY};
     if(fUseImpPar) arrayForSparse[3]=imppar;
-    const int pdg = std::abs(part->PdgCode());
-    Int_t jPDG=-1;
-    for (int iSpecies = 0; iSpecies < AliPID::kSPECIESC; ++iSpecies) {
-      if (pdg == AliPID::ParticleCode(iSpecies)) {
-        jPDG=iSpecies;
-        break;
-      }
-    }
-    if(jPDG>0){
-      if(fUseLocDen) arrayForSparse[3]=GetLocalTrackDens(trEtaPhiMap,part->Eta(),part->Phi());
-      const int iCharge = part->Charge() > 0 ? 1 : 0;
-      fGenerated[jPDG][iCharge]->Fill(arrayForSparse);
-      if(eventAccepted) fGeneratedEvSel[jPDG][iCharge]->Fill(arrayForSparse);
-    }
+    if(fUseLocDen) arrayForSparse[3]=GetLocalTrackDens(trEtaPhiMap,part->Eta(),part->Phi());
+
+    std::cout << "Particle fill histos " << iMC << " pdg " << part->PdgCode() << " charge " << iCharge << " part charge: " << part->Charge() << " filling histogram: " << fGenerated[iSpecies][iCharge]->GetName() << std::endl;
+    fGenerated[iSpecies][iCharge]->Fill(arrayForSparse);
+    if(eventAccepted) fGeneratedEvSel[iSpecies][iCharge]->Fill(arrayForSparse);
   }
+
   if (!eventAccepted) {
     delete trEtaPhiMap;
     PostData(1, fOutputList);
@@ -543,7 +546,6 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     }
     fHistNTracks->Fill(5);
 
-    const int iCharge = mcPart->Charge() > 0 ? 1 : 0;
     int iSpecies = -1;
     for (int iS = 0; iS < AliPID::kSPECIESC; ++iS) {
       if (std::abs(mcPart->PdgCode()) == AliPID::ParticleCode(iS)) {
@@ -552,7 +554,10 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
       }
     }
     if (iSpecies < 0) continue;
+    // Somehow for electrons the charge is positive for PDG -11, negative for PDG 11
+    const int iCharge = iSpecies == 0 ? (mcPart->Charge() > 0 ? 1 : 0) : (mcPart->Charge() > 0 ? 0 : 1);
     fHistNTracks->Fill(6);
+    std::cout << "Track fill histos " << iT << " pdg " << mcPart->PdgCode() << " charge " << iCharge << " part charge: " << mcPart->Charge() << " filling histogram: " << fReconstructed[iSpecies][iCharge]->GetName() << std::endl;
 
     const double pt = fUseGeneratedKine ? mcPart->Pt() : track->Pt() * AliPID::ParticleCharge(iSpecies);
     const double eta = fUseGeneratedKine ? mcPart->Eta() : track->Eta();
