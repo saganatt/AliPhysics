@@ -478,8 +478,7 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
       }
     }
     if (iSpecies < 0) continue;
-    // Somehow for electrons the charge is positive for PDG -11, negative for PDG 11
-    const int iCharge = iSpecies == 0 ? (part->Charge() > 0 ? 1 : 0) : (part->Charge() > 0 ? 0 : 1);
+    const int iCharge = part->Charge() > 0 ? 0 : 1;
     
     double distx = part->Xv() - xMCVertex;
     double disty = part->Yv() - yMCVertex;
@@ -555,7 +554,7 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     }
     if (iSpecies < 0) continue;
     // Somehow for electrons the charge is positive for PDG -11, negative for PDG 11
-    const int iCharge = iSpecies == 0 ? (mcPart->Charge() > 0 ? 1 : 0) : (mcPart->Charge() > 0 ? 0 : 1);
+    const int iCharge = mcPart->Charge() > 0 ? 0 : 1;
     fHistNTracks->Fill(6);
     std::cout << "Track fill histos " << iT << " pdg " << mcPart->PdgCode() << " charge " << iCharge << " part charge: " << mcPart->Charge() << " filling histogram: " << fReconstructed[iSpecies][iCharge]->GetName() << std::endl;
 
