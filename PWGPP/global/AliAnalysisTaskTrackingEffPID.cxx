@@ -553,7 +553,6 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
       }
     }
     if (iSpecies < 0) continue;
-    // Somehow for electrons the charge is positive for PDG -11, negative for PDG 11
     const int iCharge = mcPart->Charge() > 0 ? 0 : 1;
     fHistNTracks->Fill(6);
     std::cout << "Track fill histos " << iT << " pdg " << mcPart->PdgCode() << " charge " << iCharge << " part charge: " << mcPart->Charge() << " filling histogram: " << fReconstructed[iSpecies][iCharge]->GetName() << std::endl;
