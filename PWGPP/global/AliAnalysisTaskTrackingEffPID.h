@@ -139,6 +139,11 @@ private:
   THnSparseF* fReconstructed[AliPID::kSPECIESC][2];       //!<! Reconstructed particles (pt, eta, phi, mult, zvert)
   THnSparseF* fReconstructedTOF[AliPID::kSPECIESC][2];    //!<! Reconstructed particles after PID (pt, eta, phi, mult, zvert)
   THnSparseF* fReconstructedPID[AliPID::kSPECIESC][2];    //!<! Reconstructed particles after PID (pt, eta, phi, mult, zvert)
+  TH1D* fRawPt;
+  TH1D* fRawEta;
+  TH1D* fRawPhi;
+
+  bool collisionProcessed;
 
 
   /// \cond CLASSDEF

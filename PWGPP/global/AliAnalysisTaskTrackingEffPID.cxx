@@ -98,7 +98,11 @@ AliAnalysisTaskTrackingEffPID::AliAnalysisTaskTrackingEffPID() :
   fHistNParticles{0x0},
   fHistNTracks{0x0},
   fHistPileupTagAOD{0x0},
-  hHistXsecVsPtHard{0x0}
+  hHistXsecVsPtHard{0x0},
+  collisionProcessed{false},
+  fRawPt{0x0},
+  fRawEta{0x0},
+  fRawPhi{0x0}
 {
   // default: use the filter bit 4 cuts
   fTrackCuts = AliESDtrackCuts::GetStandardITSTPCTrackCuts2011(kFALSE);
@@ -261,6 +265,14 @@ void AliAnalysisTaskTrackingEffPID::UserCreateOutputObjects() {
       fOutputList->Add(fReconstructedPID[iSpecies][iCharge]);
     }
   }
+
+  fRawPt = new TH1D("rawPt", "pT of tracks read", nPtBins, ptBins);
+  fRawEta = new TH1D("rawEta", "eta of tracks read", 10, -0.8, 0.8);
+  fRawPhi = new TH1D("rawPhi", "phi of tracks read", 18, 0., 2*TMath::Pi());
+  fOutputList->Add(fRawPt);
+  fOutputList->Add(fRawEta);
+  fOutputList->Add(fRawPhi);
+
   fEventCut.AddQAplotsToList(fOutputList);
 
   fListCuts = new TList();
@@ -294,6 +306,10 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
   }
   if(!fMCEvent) {
     AliFatal("NO MC INFO FOUND");
+    return;
+  }
+
+  if (collisionProcessed) {
     return;
   }
 
@@ -439,6 +455,10 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     AliFatal("Missing PID response. Did you attach the AliPIDresponseTask to your analysis?");
   }
 
+  collisionProcessed = true;
+  std::cout << "Input event id: " << fInputEvent->GetEventNumberInFile() << " MC event id: " << fMCEvent->GetEventNumberInFile()
+            << " tracks size: " << fInputEvent->GetNumberOfTracks() << " mc particles size: " << fMCEvent->GetNumberOfTracks() << std::endl;
+
   for (int iMC = 0; iMC < fMCEvent->GetNumberOfTracks(); ++iMC) {
     AliVParticle *part = (AliVParticle*)fMCEvent->GetTrack(iMC);
     fHistNParticles->Fill(0);
@@ -487,7 +507,6 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     if(fUseImpPar) arrayForSparse[3]=imppar;
     if(fUseLocDen) arrayForSparse[3]=GetLocalTrackDens(trEtaPhiMap,part->Eta(),part->Phi());
 
-    std::cout << "Particle fill histos " << iMC << " pdg " << part->PdgCode() << " charge " << iCharge << " part charge: " << part->Charge() << " filling histogram: " << fGenerated[iSpecies][iCharge]->GetName() << std::endl;
     fGenerated[iSpecies][iCharge]->Fill(arrayForSparse);
     if(eventAccepted) fGeneratedEvSel[iSpecies][iCharge]->Fill(arrayForSparse);
   }
@@ -503,6 +522,10 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     /// Get the track and do the minimal cuts
     AliVTrack *track = dynamic_cast<AliVTrack*>(fInputEvent->GetTrack(iT));
     fHistNTracks->Fill(0);
+
+    fRawPt->Fill(track->Pt());
+    fRawEta->Fill(track->Eta());
+    fRawPhi->Fill(track->Phi());
     
     if(!isAOD){
       AliESDtrack *esdtrack = dynamic_cast<AliESDtrack*>(track); 
@@ -555,7 +578,6 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     if (iSpecies < 0) continue;
     const int iCharge = mcPart->Charge() > 0 ? 0 : 1;
     fHistNTracks->Fill(6);
-    std::cout << "Track fill histos " << iT << " pdg " << mcPart->PdgCode() << " charge " << iCharge << " part charge: " << mcPart->Charge() << " filling histogram: " << fReconstructed[iSpecies][iCharge]->GetName() << std::endl;
 
     const double pt = fUseGeneratedKine ? mcPart->Pt() : track->Pt() * AliPID::ParticleCharge(iSpecies);
     const double eta = fUseGeneratedKine ? mcPart->Eta() : track->Eta();
