@@ -108,7 +108,8 @@ AliAnalysisTaskTrackingEffPID::AliAnalysisTaskTrackingEffPID() :
   fTrackCuts = AliESDtrackCuts::GetStandardITSTPCTrackCuts2011(kFALSE);
   fTrackCuts->SetMaxDCAToVertexXY(2.4);
   fTrackCuts->SetMaxDCAToVertexZ(3.2);
-  fTrackCuts->SetDCAToVertex2D(kTRUE);
+  fTrackCuts->SetDCAToVertex2D(kFALSE); // To imitate DCA cuts in O2
+                                        // if kTRUE, see https://github.com/alisw/AliRoot/blob/c65ee5e82505d71ea67e61a77989d45dc2d1e3a6/ANALYSIS/ANALYSISalice/AliESDtrackCuts.cxx#L1397
   // default: physics selection with loose trigger mask request, pileup disabled
   fEventCut.OverrideAutomaticTriggerSelection(AliVEvent::kMB|AliVEvent::kINT7);
   fEventCut.OverridePileUpCuts(999999,999.,999.,3.,3.,kTRUE); 
@@ -507,6 +508,7 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     if(fUseImpPar) arrayForSparse[3]=imppar;
     if(fUseLocDen) arrayForSparse[3]=GetLocalTrackDens(trEtaPhiMap,part->Eta(),part->Phi());
 
+    std::cout << "Filling MC histograms" << std::endl;
     fGenerated[iSpecies][iCharge]->Fill(arrayForSparse);
     if(eventAccepted) fGeneratedEvSel[iSpecies][iCharge]->Fill(arrayForSparse);
   }
@@ -593,6 +595,7 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     bool hasTOF = HasTOF(track);
     bool TOFpid = std::abs(pid->NumberOfSigmasTOF(track, static_cast<AliPID::EParticleType>(iSpecies))) < 3;
 
+    std::cout << "Filling track histograms" << std::endl;
     fReconstructed[iSpecies][iCharge]->Fill(arrayForSparseData);
     if(hasTOF) fReconstructedTOF[iSpecies][iCharge]->Fill(arrayForSparseData);
     if(TPCpid && TOFpid) fReconstructedPID[iSpecies][iCharge]->Fill(arrayForSparseData);
