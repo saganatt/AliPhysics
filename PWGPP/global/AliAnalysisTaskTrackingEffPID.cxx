@@ -513,12 +513,12 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     if(eventAccepted) fGeneratedEvSel[iSpecies][iCharge]->Fill(arrayForSparse);
   }
 
-  if (!eventAccepted) {
-    delete trEtaPhiMap;
-    PostData(1, fOutputList);
-    return;
-  }
-  fHistNEvents->Fill(5);
+  //if (!eventAccepted) {
+  //  delete trEtaPhiMap;
+  //  PostData(1, fOutputList);
+  //  return;
+  //}
+  //fHistNEvents->Fill(5);
 
   for (int iT = 0; iT < (int)fInputEvent->GetNumberOfTracks(); ++iT) {
     /// Get the track and do the minimal cuts
@@ -529,18 +529,18 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     fRawEta->Fill(track->Eta());
     fRawPhi->Fill(track->Phi());
     
-    if(!isAOD){
-      AliESDtrack *esdtrack = dynamic_cast<AliESDtrack*>(track); 
-      if(fTrackCuts && !fTrackCuts->AcceptTrack(esdtrack)) continue;
-    }else{
-      AliAODTrack *aodtrack = dynamic_cast<AliAODTrack*>(track); 
-      if(fFilterBit<0 && aodtrack->GetID() < 0) continue;
-      if(fFilterBit>=0 && !aodtrack->TestFilterBit(BIT(fFilterBit))) continue;
-      if(fTrackCuts && fUseTrackCutsForAOD){
-        bool accept=ConvertAndSelectAODTrack(aodtrack,vESD,magField);
-        if(!accept) continue;
-      }
-    }
+    //if(!isAOD){
+    //  AliESDtrack *esdtrack = dynamic_cast<AliESDtrack*>(track); 
+    //  if(fTrackCuts && !fTrackCuts->AcceptTrack(esdtrack)) continue;
+    //}else{
+    //  AliAODTrack *aodtrack = dynamic_cast<AliAODTrack*>(track); 
+    //  if(fFilterBit<0 && aodtrack->GetID() < 0) continue;
+    //  if(fFilterBit>=0 && !aodtrack->TestFilterBit(BIT(fFilterBit))) continue;
+    //  if(fTrackCuts && fUseTrackCutsForAOD){
+    //    bool accept=ConvertAndSelectAODTrack(aodtrack,vESD,magField);
+    //    if(!accept) continue;
+    //  }
+    //}
     fHistNTracks->Fill(1);
     
     int lab=TMath::Abs(track->GetLabel());
