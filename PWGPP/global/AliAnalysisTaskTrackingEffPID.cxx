@@ -271,6 +271,7 @@ void AliAnalysisTaskTrackingEffPID::UserCreateOutputObjects() {
   fRawPt = new TH1D("rawPt", "pT of tracks read", nPtBins, ptBins);
   fRawEta = new TH1D("rawEta", "eta of tracks read", 10, -0.8, 0.8);
   fRawPhi = new TH1D("rawPhi", "phi of tracks read", 18, 0., 2*TMath::Pi());
+  Printf("Entries at init: rawPt: %f eta %f phi %f", fRawPt->GetEntries(), fRawEta->GetEntries(), fRawPhi->GetEntries());
   fOutputList->Add(fRawPt);
   fOutputList->Add(fRawEta);
   fOutputList->Add(fRawPhi);
@@ -521,6 +522,7 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
   //}
   //fHistNEvents->Fill(5);
 
+  Printf("Number of tracks: %d", (int)fInputEvent->GetNumberOfTracks());
   for (int iT = 0; iT < (int)fInputEvent->GetNumberOfTracks(); ++iT) {
     /// Get the track and do the minimal cuts
     AliVTrack *track = dynamic_cast<AliVTrack*>(fInputEvent->GetTrack(iT));
@@ -529,7 +531,9 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     fRawPt->Fill(track->Pt());
     fRawEta->Fill(track->Eta());
     fRawPhi->Fill(track->Phi());
-    Printf("rawPt entries: %d raw phi: %d raw eta: %d", fRawPt->GetEntries(), fRawEta->GetEntries(), fRawPhi->GetEntries());
+    std::cout << "track " << iT << " rawPt entries: " << fRawPt->GetEntries() << " pt " << track->Pt()
+              << " rawEta: " << fRawEta->GetEntries() << " eta " << track->Eta()
+              << " rawPhi: " << fRawPhi->GetEntries() << " phi " << track->Phi();
     
     //if(!isAOD){
     //  AliESDtrack *esdtrack = dynamic_cast<AliESDtrack*>(track); 
