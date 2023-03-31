@@ -529,6 +529,7 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     fRawPt->Fill(track->Pt());
     fRawEta->Fill(track->Eta());
     fRawPhi->Fill(track->Phi());
+    Printf("rawPt entries: %d raw phi: %d raw eta: %d", fRawPt->GetEntries(), fRawEta->GetEntries(), fRawPhi->GetEntries());
     
     //if(!isAOD){
     //  AliESDtrack *esdtrack = dynamic_cast<AliESDtrack*>(track); 
