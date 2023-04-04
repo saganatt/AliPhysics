@@ -510,17 +510,16 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     if(fUseImpPar) arrayForSparse[3]=imppar;
     if(fUseLocDen) arrayForSparse[3]=GetLocalTrackDens(trEtaPhiMap,part->Eta(),part->Phi());
 
-    std::cout << "Filling MC histograms" << std::endl;
     fGenerated[iSpecies][iCharge]->Fill(arrayForSparse);
     if(eventAccepted) fGeneratedEvSel[iSpecies][iCharge]->Fill(arrayForSparse);
   }
 
-  //if (!eventAccepted) {
-  //  delete trEtaPhiMap;
-  //  PostData(1, fOutputList);
-  //  return;
-  //}
-  //fHistNEvents->Fill(5);
+  if (!eventAccepted) {
+    delete trEtaPhiMap;
+    PostData(1, fOutputList);
+    return;
+  }
+  fHistNEvents->Fill(5);
 
   Printf("Number of tracks: %d", (int)fInputEvent->GetNumberOfTracks());
   for (int iT = 0; iT < (int)fInputEvent->GetNumberOfTracks(); ++iT) {
@@ -533,20 +532,20 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     fRawPhi->Fill(track->Phi());
     std::cout << "track " << iT << " rawPt entries: " << fRawPt->GetEntries() << " pt " << track->Pt()
               << " rawEta: " << fRawEta->GetEntries() << " eta " << track->Eta()
-              << " rawPhi: " << fRawPhi->GetEntries() << " phi " << track->Phi();
+              << " rawPhi: " << fRawPhi->GetEntries() << " phi " << track->Phi() << std::endl;
     
-    //if(!isAOD){
-    //  AliESDtrack *esdtrack = dynamic_cast<AliESDtrack*>(track); 
-    //  if(fTrackCuts && !fTrackCuts->AcceptTrack(esdtrack)) continue;
-    //}else{
-    //  AliAODTrack *aodtrack = dynamic_cast<AliAODTrack*>(track); 
-    //  if(fFilterBit<0 && aodtrack->GetID() < 0) continue;
-    //  if(fFilterBit>=0 && !aodtrack->TestFilterBit(BIT(fFilterBit))) continue;
-    //  if(fTrackCuts && fUseTrackCutsForAOD){
-    //    bool accept=ConvertAndSelectAODTrack(aodtrack,vESD,magField);
-    //    if(!accept) continue;
-    //  }
-    //}
+    if(!isAOD){
+      AliESDtrack *esdtrack = dynamic_cast<AliESDtrack*>(track); 
+      if(fTrackCuts && !fTrackCuts->AcceptTrack(esdtrack)) continue;
+    }else{
+      AliAODTrack *aodtrack = dynamic_cast<AliAODTrack*>(track); 
+      if(fFilterBit<0 && aodtrack->GetID() < 0) continue;
+      if(fFilterBit>=0 && !aodtrack->TestFilterBit(BIT(fFilterBit))) continue;
+      if(fTrackCuts && fUseTrackCutsForAOD){
+        bool accept=ConvertAndSelectAODTrack(aodtrack,vESD,magField);
+        if(!accept) continue;
+      }
+    }
     fHistNTracks->Fill(1);
     
     int lab=TMath::Abs(track->GetLabel());
@@ -601,7 +600,6 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     bool hasTOF = HasTOF(track);
     bool TOFpid = std::abs(pid->NumberOfSigmasTOF(track, static_cast<AliPID::EParticleType>(iSpecies))) < 3;
 
-    std::cout << "Filling track histograms" << std::endl;
     fReconstructed[iSpecies][iCharge]->Fill(arrayForSparseData);
     if(hasTOF) fReconstructedTOF[iSpecies][iCharge]->Fill(arrayForSparseData);
     if(TPCpid && TOFpid) fReconstructedPID[iSpecies][iCharge]->Fill(arrayForSparseData);
