@@ -92,7 +92,6 @@ AliAnalysisTaskTrackingEffPID::AliAnalysisTaskTrackingEffPID() :
   fSelectPtHardRange{false},
   fMinPtHard{0.},
   fMaxPtHard{99999.},
-  collisionProcessed{false},
   fOutputList{0x0},
   fListCuts{0x0},
   fHistNEvents{0x0},
@@ -102,7 +101,8 @@ AliAnalysisTaskTrackingEffPID::AliAnalysisTaskTrackingEffPID() :
   hHistXsecVsPtHard{0x0},
   fRawPt{0x0},
   fRawEta{0x0},
-  fRawPhi{0x0}
+  fRawPhi{0x0},
+  collisionProcessed{false}
 {
   // default: use the filter bit 4 cuts
   fTrackCuts = AliESDtrackCuts::GetStandardITSTPCTrackCuts2011(kFALSE);
@@ -502,7 +502,17 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     }
     if (iSpecies < 0) continue;
     const int iCharge = part->Charge() > 0 ? 0 : 1;
-    
+//
+//    if (part->Pt() < 0.1 || part->Pt() > 1e+10) {
+//      continue;
+//    }
+//    if (part->Eta() < -0.8 || part->Eta() > 0.8) {
+//      continue;
+//    }
+//    if (part->Phi() < 0.0 || part->Phi() > 6.28319) {
+//      continue;
+//    }
+ 
     double distx = part->Xv() - xMCVertex;
     double disty = part->Yv() - yMCVertex;
     double distXY = TMath::Sqrt(distx*distx+disty*disty);
@@ -512,6 +522,11 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
 
     fGenerated[iSpecies][iCharge]->Fill(arrayForSparse);
     if(eventAccepted) fGeneratedEvSel[iSpecies][iCharge]->Fill(arrayForSparse);
+
+    std::cout << "MC particle " << iMC << " pt " << part->Pt() << " eta " << part->Eta() << " phi " << part->Phi() << std::endl;
+    if (eventAccepted) {
+      std::cout << "event accepted MC particle " << iMC << " pt " << part->Pt() << " eta " << part->Eta() << " phi " << part->Phi() << std::endl;
+    }
   }
 
   if (!eventAccepted) {
@@ -603,6 +618,11 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     fReconstructed[iSpecies][iCharge]->Fill(arrayForSparseData);
     if(hasTOF) fReconstructedTOF[iSpecies][iCharge]->Fill(arrayForSparseData);
     if(TPCpid && TOFpid) fReconstructedPID[iSpecies][iCharge]->Fill(arrayForSparseData);
+
+    std::cout << "Track " << iT << " pt " << track->Pt() << " eta " << track->Eta() << " phi " << track->Phi() << std::endl;
+    if (hasTOF) {
+      std::cout << "TOF track " << iT << " pt " << track->Pt() << " eta " << track->Eta() << " phi " << track->Phi() << std::endl;
+    }
 
   } // End track loop
   delete trEtaPhiMap;
