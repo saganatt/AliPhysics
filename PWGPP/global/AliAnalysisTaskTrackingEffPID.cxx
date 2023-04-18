@@ -102,6 +102,9 @@ AliAnalysisTaskTrackingEffPID::AliAnalysisTaskTrackingEffPID() :
   fRawPt{0x0},
   fRawEta{0x0},
   fRawPhi{0x0},
+  fRawMCPt{0x0},
+  fRawMCEta{0x0},
+  fRawMCPhi{0x0},
   collisionProcessed{false}
 {
   // default: use the filter bit 4 cuts
@@ -275,6 +278,13 @@ void AliAnalysisTaskTrackingEffPID::UserCreateOutputObjects() {
   fOutputList->Add(fRawPt);
   fOutputList->Add(fRawEta);
   fOutputList->Add(fRawPhi);
+  fRawMCPt = new TH1D("rawMCPt", "pT of particles read", nPtBins, ptBins);
+  fRawMCEta = new TH1D("rawMCEta", "eta of particles read", 10, -0.8, 0.8);
+  fRawMCPhi = new TH1D("rawMCPhi", "phi of particles read", 18, 0., 2*TMath::Pi());
+  Printf("Entries MC at init: rawPt: %f eta %f phi %f", fRawMCPt->GetEntries(), fRawMCEta->GetEntries(), fRawMCPhi->GetEntries());
+  fOutputList->Add(fRawMCPt);
+  fOutputList->Add(fRawMCEta);
+  fOutputList->Add(fRawMCPhi);
 
   fEventCut.AddQAplotsToList(fOutputList);
 
@@ -464,6 +474,14 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
 
   for (int iMC = 0; iMC < fMCEvent->GetNumberOfTracks(); ++iMC) {
     AliVParticle *part = (AliVParticle*)fMCEvent->GetTrack(iMC);
+
+    fRawMCPt->Fill(part->Pt());
+    fRawMCEta->Fill(part->Eta());
+    fRawMCPhi->Fill(part->Phi());
+    std::cout << "particle " << iMC << " rawPt entries: " << fRawMCPt->GetEntries() << " pt " << part->Pt()
+              << " rawEta: " << fRawMCEta->GetEntries() << " eta " << part->Eta()
+              << " rawPhi: " << fRawMCPhi->GetEntries() << " phi " << part->Phi() << std::endl;
+
     fHistNParticles->Fill(0);
     if(aodMcHeader && aodMcArray){
       Bool_t isPil1=AliAnalysisUtils::IsParticleFromOutOfBunchPileupCollision(iMC,fMCEvent);
@@ -502,16 +520,16 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     }
     if (iSpecies < 0) continue;
     const int iCharge = part->Charge() > 0 ? 0 : 1;
-//
-//    if (part->Pt() < 0.1 || part->Pt() > 1e+10) {
-//      continue;
-//    }
-//    if (part->Eta() < -0.8 || part->Eta() > 0.8) {
-//      continue;
-//    }
-//    if (part->Phi() < 0.0 || part->Phi() > 6.28319) {
-//      continue;
-//    }
+
+    if (part->Pt() < 0.1 || part->Pt() > 1e+10) {
+      continue;
+    }
+    if (part->Eta() < -0.8 || part->Eta() > 0.8) {
+      continue;
+    }
+    if (part->Phi() < 0.0 || part->Phi() > 6.28319) {
+      continue;
+    }
  
     double distx = part->Xv() - xMCVertex;
     double disty = part->Yv() - yMCVertex;

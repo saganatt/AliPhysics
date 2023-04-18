@@ -206,6 +206,9 @@ private:
   TH1D* fRawPt;
   TH1D* fRawEta;
   TH1D* fRawPhi;
+  TH1D* fRawMCPt;
+  TH1D* fRawMCEta;
+  TH1D* fRawMCPhi;
 
   bool collisionProcessed;
 
