@@ -322,9 +322,9 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     return;
   }
 
-  if (collisionProcessed) {
-    return;
-  }
+  //if (collisionProcessed) {
+  //  return;
+  //}
 
   bool isAOD = fInputEvent->IsA()->InheritsFrom("AliAODEvent");
   bool eventAccepted = fEventCut.AcceptEvent(fInputEvent);
@@ -468,7 +468,7 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     AliFatal("Missing PID response. Did you attach the AliPIDresponseTask to your analysis?");
   }
 
-  collisionProcessed = true;
+  //collisionProcessed = true;
   //std::cout << "Input event id: " << fInputEvent->GetEventNumberInFile() << " MC event id: " << fMCEvent->GetEventNumberInFile()
   //          << " tracks size: " << fInputEvent->GetNumberOfTracks() << " mc particles size: " << fMCEvent->GetNumberOfTracks() << std::endl;
 
@@ -505,7 +505,7 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
       double distz=TMath::Abs(part->Zv()-zMCVertex);
       if(pRad2>8 || distz>1) continue;
     }
-    //std::cout << "physical primary MC particle " << iMC << " pt " << part->Pt() << " eta " << part->Eta() << " phi " << part->Phi() << " pdg: " << part->PdgCode() << " isPhysicalPrimary: " << part->IsPhysicalPrimary() << std::endl;
+    std::cout << "physical primary MC particle " << iMC << " pt " << part->Pt() << " eta " << part->Eta() << " phi " << part->Phi() << " pdg: " << part->PdgCode() << " isPhysicalPrimary: " << part->IsPhysicalPrimary() << std::endl;
     fHistNParticles->Fill(3);
     if(lh && (fKeepOnlyInjected || fKeepOnlyUE)){
       bool isInjected=IsInjectedParticle(iMC,lh);
@@ -535,7 +535,7 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     if (part->Phi() < 0.0 || part->Phi() > 6.28319) {
       continue;
     }
-    //std::cout << "accepted MC particle " << iMC << " pt " << part->Pt() << " eta " << part->Eta() << " phi " << part->Phi() << " pdg: " << part->PdgCode() << " isPhysicalPrimary: " << part->IsPhysicalPrimary() << std::endl;
+    std::cout << "accepted MC particle " << iMC << " pt " << part->Pt() << " eta " << part->Eta() << " phi " << part->Phi() << " pdg: " << part->PdgCode() << " isPhysicalPrimary: " << part->IsPhysicalPrimary() << std::endl;
  
     double distx = part->Xv() - xMCVertex;
     double disty = part->Yv() - yMCVertex;
@@ -588,7 +588,7 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     if (mcPart->Phi() < 0.0 || mcPart->Phi() > 6.28319) {
       continue;
     }
-    //std::cout << "track with accepted mc particle: " << iT << " pt " << track->Pt() << " eta " << track->Eta() << " phi " << track->Phi() << " particle pdg: " << mcPart->PdgCode() << " isPhysicalPrimary: " << mcPart->IsPhysicalPrimary() << std::endl;
+    std::cout << "track with accepted mc particle: " << iT << " pt " << track->Pt() << " eta " << track->Eta() << " phi " << track->Phi() << " particle pdg: " << mcPart->PdgCode() << " isPhysicalPrimary: " << mcPart->IsPhysicalPrimary() << std::endl;
     
     if(!isAOD){
       AliESDtrack *esdtrack = dynamic_cast<AliESDtrack*>(track); 
@@ -604,7 +604,7 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     }
     fHistNTracks->Fill(1);
 
-    //std::cout << "track after cuts: " << iT << " pt " << track->Pt() << " eta " << track->Eta() << " phi " << track->Phi() << std::endl;
+    std::cout << "track after cuts: " << iT << " pt " << track->Pt() << " eta " << track->Eta() << " phi " << track->Phi() << std::endl;
 
     if(AliAnalysisUtils::IsParticleFromOutOfBunchPileupCollision(lab,fMCEvent)){
       fHistNTracks->Fill(2);
@@ -623,7 +623,7 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
       if(pRad2>8 || distz>1) continue;
     }
     fHistNTracks->Fill(4);
-    //std::cout << "track with physical primary mc particle: " << iT << " pt " << track->Pt() << " eta " << track->Eta() << " phi " << track->Phi() << " particle pdg: " << mcPart->PdgCode() << " isPhysicalPrimary: " << mcPart->IsPhysicalPrimary() << std::endl;
+    std::cout << "track with physical primary mc particle: " << iT << " pt " << track->Pt() << " eta " << track->Eta() << " phi " << track->Phi() << " particle pdg: " << mcPart->PdgCode() << " isPhysicalPrimary: " << mcPart->IsPhysicalPrimary() << std::endl;
     if(lh && (fKeepOnlyInjected || fKeepOnlyUE)){
       bool isInjected=IsInjectedParticle(lab,lh);
       if(fKeepOnlyInjected && !isInjected) continue;
@@ -661,7 +661,7 @@ void AliAnalysisTaskTrackingEffPID::UserExec(Option_t *){
     if(hasTOF) fReconstructedTOF[iSpecies][iCharge]->Fill(arrayForSparseData);
     if(TPCpid && TOFpid) fReconstructedPID[iSpecies][iCharge]->Fill(arrayForSparseData);
 
-    //std::cout << "Track " << iT << " pt " << track->Pt() << " eta " << track->Eta() << " phi " << track->Phi() << " pdg: " << mcPart->PdgCode() << " isPhysicalPrimary: " << mcPart->IsPhysicalPrimary() << std::endl;
+    std::cout << "Track " << iT << " pt " << track->Pt() << " eta " << track->Eta() << " phi " << track->Phi() << " pdg: " << mcPart->PdgCode() << " isPhysicalPrimary: " << mcPart->IsPhysicalPrimary() << std::endl;
     //if (hasTOF) {
     //  std::cout << "TOF track " << iT << " pt " << track->Pt() << " eta " << track->Eta() << " phi " << track->Phi() << " pdg: " << mcPart->PdgCode() << " isPhysicalPrimary: " << mcPart->IsPhysicalPrimary() << std::endl;
     //}
